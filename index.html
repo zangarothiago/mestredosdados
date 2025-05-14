@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <!-- Favicon dado -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mestre dos Dados</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <style>
+        /* Animação de brilho/pulsar verde-amarelo para o título */
+        .brilho-titulo {
+            animation: brilhoVerdeAmarelo 2s infinite alternate cubic-bezier(0.4,0,0.6,1);
+            text-shadow: 0 0 15px #00ff41, 0 0 30px #ffe600;
+            transition: color 0.4s;
+        }
+        @keyframes brilhoVerdeAmarelo {
+            0% {
+                color: #00ff41;
+                text-shadow: 0 0 15px #00ff41, 0 0 30px #00ff41;
+            }
+            50% {
+                color: #ffe600;
+                text-shadow: 0 0 20px #ffe600, 0 0 40px #ffe600;
+            }
+            100% {
+                color: #00ff41;
+                text-shadow: 0 0 15px #00ff41, 0 0 30px #00ff41;
+            }
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Inconsolata', monospace;
+            background-color: #000;
+            color: #00ff41;
+            overflow-x: hidden;
+        }
+        
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+        }
+        
+        .glitch {
+            position: relative;
+        }
+        
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00ff;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+        
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 #00ffff;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+        
+        @keyframes glitch-anim {
+            0% { clip: rect(31px, 9999px, 94px, 0); }
+            10% { clip: rect(112px, 9999px, 76px, 0); }
+            20% { clip: rect(85px, 9999px, 77px, 0); }
+            30% { clip: rect(27px, 9999px, 97px, 0); }
+            40% { clip: rect(64px, 9999px, 98px, 0); }
+            50% { clip: rect(61px, 9999px, 85px, 0); }
+            60% { clip: rect(99px, 9999px, 114px, 0); }
+            70% { clip: rect(34px, 9999px, 115px, 0); }
+            80% { clip: rect(98px, 9999px, 129px, 0); }
+            90% { clip: rect(43px, 9999px, 96px, 0); }
+            100% { clip: rect(82px, 9999px, 64px, 0); }
+        }
+        
+        @keyframes glitch-anim2 {
+            0% { clip: rect(65px, 9999px, 119px, 0); }
+            10% { clip: rect(79px, 9999px, 85px, 0); }
+            20% { clip: rect(75px, 9999px, 99px, 0); }
+            30% { clip: rect(67px, 9999px, 62px, 0); }
+            40% { clip: rect(33px, 9999px, 52px, 0); }
+            50% { clip: rect(147px, 9999px, 53px, 0); }
+            60% { clip: rect(105px, 9999px, 96px, 0); }
+            70% { clip: rect(129px, 9999px, 152px, 0); }
+            80% { clip: rect(54px, 9999px, 44px, 0); }
+            90% { clip: rect(138px, 9999px, 122px, 0); }
+            100% { clip: rect(133px, 9999px, 144px, 0); }
+        }
+        
+        .terminal {
+            border: 1px solid #00ff41;
+            border-radius: 5px;
+            box-shadow: 0 0 10px #00ff41;
+            position: relative;
+        }
+        
+        .terminal-header {
+            background-color: #00ff41;
+            color: #000;
+            padding: 5px 10px;
+            font-weight: bold;
+        }
+        
+        .terminal-body {
+            padding: 15px;
+            height: 200px;
+            overflow-y: auto;
+        }
+        
+        .terminal-input {
+            color: #00ff41;
+        }
+        
+        .terminal-cursor {
+            display: inline-block;
+            width: 10px;
+            height: 15px;
+            background-color: #00ff41;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        
+        .rain {
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background-color: #00ff41;
+            opacity: 0.7;
+            animation: rain-fall linear infinite;
+        }
+        
+        @keyframes rain-fall {
+            to {
+                transform: translateY(100vh);
+            }
+        }
+        
+        .neon-border {
+            position: relative;
+        }
+        
+        .neon-border::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border: 2px solid #00ff41;
+            border-radius: 8px;
+            box-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .neon-border:hover::before {
+            opacity: 1;
+        }
+        
+        .code-block {
+            background-color: rgba(0, 20, 0, 0.5);
+            border-left: 3px solid #00ff41;
+            padding: 10px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Matrix Rain Background -->
+    <canvas id="matrix" class="matrix-bg"></canvas>
+    
+    <!-- Header -->
+    <header class="container mx-auto px-4 py-8">
+        <div class="flex justify-between items-center">
+            <div class="glitch" data-text="MESTRE DOS DADOS">
+                <a href="/" title="Ir para a página inicial">
+  <h1 class="text-4xl md:text-6xl font-bold text-green-400 brilho-titulo">MESTRE DOS DADOS</h1>
+</a>
+            </div>
+            <nav>
+                <ul class="flex space-x-6">
+                    <li><a href="#services" class="hover:text-green-300 transition-colors">SERVIÇOS</a></li>
+                    <li><a href="#about" class="hover:text-green-300 transition-colors">SOBRE</a></li>
+                    <li><a href="#contact" class="hover:text-green-300 transition-colors">CONTATO</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <!-- Hero Section -->
+    <section class="container mx-auto px-4 py-20">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div>
+                <h2 class="text-3xl md:text-5xl font-bold mb-6">
+                    <span class="text-green-400">DESVENDANDO</span> OS SEGREDOS DOS DADOS
+                </h2>
+                <p class="text-xl mb-8 leading-relaxed">
+                    Transformamos dados brutos em inteligência estratégica. 
+                    Python, Ciência de Dados e Inteligência Artificial para desbloquear 
+                    o potencial oculto em seus sistemas.
+                </p>
+                <div class="flex space-x-4">
+                    <a href="#contact" class="bg-green-400 hover:bg-green-300 text-black font-bold py-3 px-6 rounded transition-colors neon-border">
+                        FALE CONOSCO
+                    </a>
+                    <a href="#services" class="border border-green-400 hover:bg-green-900 text-green-400 font-bold py-3 px-6 rounded transition-colors neon-border">
+                        NOSSOS SERVIÇOS
+                    </a>
+                </div>
+            </div>
+            <div class="terminal">
+                <div class="terminal-header">
+                    <i class="fas fa-terminal mr-2"></i> terminal ~/mestre_dos_dados
+                </div>
+                <div class="terminal-body" id="terminal-output">
+                    <p class="terminal-input">$ python analyze_data.py</p>
+                    <p>> Iniciando análise de dados...</p>
+                    <p>> Processando 1.2TB de dados...</p>
+                    <p>> Aplicando modelos de machine learning...</p>
+                    <p>> Identificando padrões ocultos...</p>
+                    <p>> Gerando insights estratégicos...</p>
+                    <p class="terminal-input">$ <span class="terminal-cursor"></span></p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Services Section -->
+    <section id="services" class="container mx-auto px-4 py-20 bg-black bg-opacity-70">
+        <h2 class="text-4xl font-bold mb-16 text-center">
+            <span class="text-green-400">NOSSOS</span> SERVIÇOS
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Service 1 -->
+            <div class="p-6 rounded-lg border border-green-400 hover:shadow-lg hover:shadow-green-400/20 transition-all neon-border">
+                <div class="text-5xl mb-4 text-green-400">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-3">Inteligência Artificial</h3>
+                <p>
+                    Desenvolvemos sistemas de IA personalizados que aprendem com seus dados,
+                    automatizam processos e tomam decisões inteligentes.
+                </p>
+                <div class="code-block mt-4">
+                    <p class="text-sm"># Modelo de deep learning</p>
+                    <p class="text-sm">model = Sequential([</p>
+                    <p class="text-sm ml-4">Dense(64, activation='relu'),</p>
+                    <p class="text-sm ml-4">Dense(32, activation='relu'),</p>
+                    <p class="text-sm ml-4">Dense(1, activation='sigmoid')</p>
+                    <p class="text-sm">])</p>
+                </div>
+            </div>
+            
+            <!-- Service 2 -->
+            <div class="p-6 rounded-lg border border-green-400 hover:shadow-lg hover:shadow-green-400/20 transition-all neon-border">
+                <div class="text-5xl mb-4 text-green-400">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-3">Análise de Dados</h3>
+                <p>
+                    Transformamos dados complexos em visualizações claras e insights acionáveis
+                    que impulsionam seu negócio.
+                </p>
+                <div class="code-block mt-4">
+                    <p class="text-sm"># Análise exploratória</p>
+                    <p class="text-sm">sns.pairplot(data, hue='target')</p>
+                    <p class="text-sm">plt.title('Relações entre variáveis')</p>
+                    <p class="text-sm">plt.show()</p>
+                </div>
+            </div>
+            
+            <!-- Service 3 -->
+            <div class="p-6 rounded-lg border border-green-400 hover:shadow-lg hover:shadow-green-400/20 transition-all neon-border">
+                <div class="text-5xl mb-4 text-green-400">
+                    <i class="fas fa-database"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-3">Engenharia de Dados</h3>
+                <p>
+                    Construímos processos robustos para coletar, processar e armazenar dados
+                    em escala, garantindo qualidade e disponibilidade.
+                </p>
+                <div class="code-block mt-4">
+                    <p class="text-sm"># Processos de dados</p>
+                    <p class="text-sm">@task</p>
+                    <p class="text-sm">def process_data():</p>
+                    <p class="text-sm ml-4">df = extract_from_api()</p>
+                    <p class="text-sm ml-4">df = transform_data(df)</p>
+                    <p class="text-sm ml-4">load_to_warehouse(df)</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- About Section -->
+    <section id="about" class="container mx-auto px-4 py-20">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div>
+            <img src="robo.jpg" 
+                alt="Data Science" 
+                class="rounded-lg shadow-2xl border-4 border-cyan-400">
+            </div>
+
+            <div>
+                <h2 class="text-4xl font-bold mb-6">
+                    <span class="text-green-400">SOBRE</span> O MESTRE DOS DADOS
+                </h2>
+                <p class="mb-4 leading-relaxed">
+                    Somos especialistas em Python, Ciência de Dados e Inteligência Artificial,
+                    dedicados a desvendar os segredos ocultos em seus dados. Com anos de experiência
+                    em projetos complexos, ajudamos empresas a tomar decisões baseadas em dados.
+                </p>
+                <p class="mb-4 leading-relaxed">
+                    Nosso nome é uma homenagem à matriz de dados que compõe o mundo digital,
+                    e nossa missão é ajudá-lo a navegar por esse universo complexo.
+                </p>
+                <div class="mt-8">
+                    <h3 class="text-2xl font-bold mb-4 text-green-400">TECNOLOGIAS QUE DOMINAMOS</h3>
+                    <div class="flex flex-wrap gap-3">
+                        <span class="px-3 py-1 bg-green-900 text-green-300 rounded-full">Python</span>
+                        <span class="px-3 py-1 bg-green-900 text-green-300 rounded-full">Object Pascal</span>
+                        <span class="px-3 py-1 bg-green-900 text-green-300 rounded-full">Firebird</span>
+                        <span class="px-3 py-1 bg-green-900 text-green-300 rounded-full">Heave Metal</span>
+                        <span class="px-3 py-1 bg-green-900 text-green-300 rounded-full">NumPy</span>
+                        <span class="px-3 py-1 bg-green-900 text-green-300 rounded-full">Lazarus</span>
+                        <span class="px-3 py-1 bg-green-900 text-green-300 rounded-full">Dbeaver</span>
+                        <span class="px-3 py-1 bg-green-900 text-green-300 rounded-full">SQL</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Section -->
+    <section id="contact" class="container mx-auto px-4 py-20 bg-black bg-opacity-70">
+        <h2 class="text-4xl font-bold mb-16 text-center">
+            <span class="text-green-400">ENTRE EM</span> CONTATO
+        </h2>
+        
+        <div class="flex flex-col items-center justify-center py-12">
+            <h3 class="text-2xl font-bold mb-6 text-green-400">NOSSA LOCALIZAÇÃO</h3>
+            <div class="terminal h-96 w-full md:w-2/3 lg:w-1/2 flex flex-col justify-center items-center">
+                <div class="terminal-header w-full">
+                    <i class="fas fa-map-marker-alt mr-2"></i> mapa ~/mestre_dos_dados/location
+                </div>
+                <div class="terminal-body p-0 w-full h-80 flex justify-center items-center">
+    <iframe 
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3716.2002672446343!2d-49.71394368496583!3d-20.768964986131237!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94bd6c98fa3cde4b%3A0xf6c7a6d4601a00a4!2sPra%C3%A7a%20S%C3%A3o%20Jo%C3%A3o%2C%20117%20-%20Centro%2C%20Monte%20Apraz%C3%ADvel%20-%20SP%2C%2015100-000!5e0!3m2!1spt-BR!2sbr!4v1689466543856!5m2!1spt-BR!2sbr"
+        width="100%"
+        height="100%"
+        style="border:0; border-radius: 0 0 12px 12px; box-shadow: 0 0 16px #22c55e55; display:block;"
+        allowfullscreen=""
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
+</div>
+            </div>
+        </div>
+        <div class="mt-6 space-y-4 text-center">
+            <p><i class="fas fa-envelope mr-2 text-green-400"></i> zangarothiago@gmail.com</p>
+            <p><i class="fas fa-phone mr-2 text-green-400"></i> (17) 98104-4500 WhatsApp</p>
+            <p><i class="fas fa-map-marker-alt mr-2 text-green-400"></i> Monte Aprazível / SP</p>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="container mx-auto px-4 py-8 border-t border-green-900">
+    <div class="flex flex-col items-center justify-center w-full">
+        <div class="mb-4 w-full text-center">
+            <h2 class="text-2xl font-bold text-green-400">MESTRE DOS DADOS</h2>
+            <p class="text-sm">Transformando dados em inteligência desde 2010</p>
+        </div>
+        <div class="flex space-x-6 justify-center mb-4">
+            <a href="#" class="text-green-400 hover:text-green-300"><i class="fab fa-github fa-lg"></i></a>
+            <a href="#" class="text-green-400 hover:text-green-300"><i class="fab fa-linkedin fa-lg"></i></a>
+            <a href="#" class="text-green-400 hover:text-green-300"><i class="fab fa-twitter fa-lg"></i></a>
+            <a href="#" class="text-green-400 hover:text-green-300"><i class="fab fa-medium fa-lg"></i></a>
+        </div>
+        <div class="mt-4 text-center text-sm text-green-900 w-full">
+            <p>© 2010 Mestre dos Dados. Todos os direitos reservados.</p>
+            <p class="mt-2">Nós temos a solução!</p>
+        </div>
+    </div>
+</footer>
+    
+    <!-- Matrix Rain Script -->
+    <script>
+        // Matrix rain effect
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        
+        const katakana = 'ZZZアァカサタナハマヤャラワガZZZザダバパイィキシチニZZZヒミリヰギジヂビピウゥクスZZZツヌフムユュルグズブヅプエZZZェケセテネヘメZZZレヱゲゼデベペオォコZZZソトノホモヨョロヲZZZゴゾドボポヴッン';
+        const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const nums = '0123456789';
+        const symbols = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~';
+        
+        const alphabet = katakana + latin + nums + symbols;
+        
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        
+        const rainDrops = [];
+        
+        for (let x = 0; x < columns; x++) {
+            rainDrops[x] = 1;
+        }
+        
+        const draw = () => {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#00ff41';
+            ctx.font = fontSize + 'px monospace';
+            
+            for (let i = 0; i < rainDrops.length; i++) {
+                const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+                ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+                
+                if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    rainDrops[i] = 0;
+                }
+                rainDrops[i]++;
+            }
+        };
+        
+        setInterval(draw, 30);
+        
+        // Terminal typing effect
+        const terminalLines = [
+            "Bem-vindo ao terminal do Mestre dos Dados...",
+            "> Inicializando sistemas...",
+            "> Carregando módulos de Python...",
+            "> Conectando ao banco de dados...",
+            "> Pronto para análise.",
+            "$ python analyze_data.py --full-scan",
+            "> Processando dados...",
+            "> Aplicando algoritmos de machine learning...",
+            "> Identificando padrões...",
+            "> Gerando relatórios...",
+            "> Análise concluída com sucesso!",
+            "$ "
+        ];
+        
+        const terminalOutput = document.getElementById('terminal-output');
+        let currentLine = 0;
+        
+        function typeTerminal() {
+            if (currentLine < terminalLines.length) {
+                const line = terminalLines[currentLine];
+                const p = document.createElement('p');
+                
+                if (line.startsWith("$ ")) {
+                    p.className = 'terminal-input';
+                    p.innerHTML = line + '<span class="terminal-cursor"></span>';
+                } else {
+                    p.textContent = line;
+                }
+                
+                terminalOutput.appendChild(p);
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+                currentLine++;
+                
+                setTimeout(typeTerminal, Math.random() * 500 + 200);
+            } else {
+                // Reset animation after a while
+                setTimeout(() => {
+                    terminalOutput.innerHTML = '<p class="terminal-input">$ <span class="terminal-cursor"></span></p>';
+                    currentLine = 0;
+                    setTimeout(typeTerminal, 1000);
+                }, 5000);
+            }
+        }
+        
+        // Start typing after a delay
+        setTimeout(typeTerminal, 1500);
+        
+        // Responsive adjustments
+        window.addEventListener('resize', () => {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        });
+    </script>
+</body>
+</html>
